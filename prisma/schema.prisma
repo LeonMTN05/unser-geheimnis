@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Secret {
+  id             String   @id @default(cuid())       // Öffentliche ID (in URL)
+  encryptedData  Bytes                                 // Verschlüsselter Text/Datei-Blob
+  iv             Bytes                                 // Initialization Vector (12 Bytes)
+  type           String                                // "TEXT" oder "FILE" (als String für SQLite MVP)
+  fileName       String?                               // Originaler Dateiname
+  fileSize       Int?                                  // Dateigröße in Bytes
+  mimeType       String?                               // MIME-Type für Download
+  expiresAt      DateTime                              // Ablaufzeitpunkt (UTC)
+  burnAfterRead  Boolean  @default(true)               // Sofort nach Lesen löschen?
+  readCount      Int      @default(0)                  // Wie oft abgerufen
+  createdAt      DateTime @default(now())
+  
+  @@index([expiresAt])  // Index für schnelle Cleanup-Abfragen
+}
