@@ -343,6 +343,5 @@ MIT License — siehe [LICENSE](LICENSE)
 
 <div align="center">
 
-Made with ♥ in Deutschland &nbsp;|&nbsp; [unser-geheimnis.de](https://unser-geheimnis.de) &nbsp;|&nbsp; [Datenschutz](https://unser-geheimnis.de/datenschutz) &nbsp;|&nbsp; [Impressum](https://unser-geheimnis.de/impressum)
-
+Made with ♥ in Deutschland &nbsp;|&nbsp; [unser-geheimnis.de](https://unser-geheimnis.de) &nbsp;
 </div>
