@@ -6,6 +6,7 @@ import { ExpirySelector } from "./ExpirySelector";
 import { CopyField } from "./CopyField";
 import { ValidTTL } from "@/lib/constants";
 import { generateRequestKeyPair, solvePow, type PowChallenge } from "@/lib/requestCrypto";
+import { saveRetrieval } from "@/lib/requestStore";
 import { REQUEST_MESSAGE_MAX, REQUEST_NAME_MAX, containsLink } from "@/lib/requestValidation";
 
 type Pow = PowChallenge & { number: number };
@@ -13,6 +14,7 @@ type PowState = { status: "idle" | "solving" | "ready" | "error"; solution?: Pow
 
 interface Created {
   id: string;
+  stored: boolean; // Abruf-Link in diesem Browser gespeichert
   status: "OPEN" | "PENDING_VERIFICATION";
   expiresAt: string;
   retrievalUrl: string;
@@ -109,11 +111,14 @@ export function RequestCreator() {
       }
 
       const origin = window.location.origin;
+      const retrievalUrl = `${origin}/abruf/${data.retrievalToken}#${privateKey}`;
+      const stored = saveRetrieval(data.id, retrievalUrl, data.expiresAt);
       setCreated({
+        stored,
         id: data.id,
         status: data.status,
         expiresAt: data.expiresAt,
-        retrievalUrl: `${origin}/abruf/${data.retrievalToken}#${privateKey}`,
+        retrievalUrl,
         requestUrl: `${origin}/r/${data.id}`,
         sender: useEmail ? sender.trim() : undefined,
         recipient: useEmail ? recipient.trim() : undefined,
@@ -304,6 +309,11 @@ function RequestCreated({ created }: { created: Created }) {
           wird <strong>nicht erneut angezeigt</strong> und <strong>nicht per E-Mail verschickt</strong>. Speichere ihn jetzt (z. B. als Lesezeichen).
         </p>
         <CopyField value={created.retrievalUrl} tone="warning" />
+        {created.stored && (
+          <p className="mt-2 text-xs text-text-muted">
+            ✓ Zusätzlich in diesem Browser gespeichert{created.sender ? ": Der Button in der Benachrichtigungs-Mail öffnet die Antwort hier direkt" : ""}.
+          </p>
+        )}
       </section>
 
       {/* 2a. Ohne E-Mail: Link selbst teilen */}

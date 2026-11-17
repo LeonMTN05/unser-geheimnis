@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { base64ToArrayBuffer } from "@/lib/crypto";
 import { aesDecrypt, decryptMeta, openFromResponder } from "@/lib/requestCrypto";
 import { CopyField } from "./CopyField";
+import { removeRetrieval } from "@/lib/requestStore";
 
 interface Status {
   id: string;
@@ -61,6 +62,8 @@ export function RequestRetriever({ token }: { token: string }) {
       const res = await fetch(`/api/requests/retrieve/${token}`, { method: "POST" });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || "Abruf fehlgeschlagen.");
+      // Antwort ist serverseitig gelöscht → gemerkten Schlüssel entfernen
+      if (status?.id) removeRetrieval(status.id);
       const key = await openFromResponder(privateKey, d.ephemeralPublicKey);
       const plain = await aesDecrypt(key, new Uint8Array(base64ToArrayBuffer(d.iv)), base64ToArrayBuffer(d.encryptedData));
       if (d.type === "FILE") {

@@ -78,6 +78,11 @@ export default function Datenschutz() {
                   E-Mail abmeldet, wird dauerhaft als Hash auf einer Sperrliste geführt, damit keine weiteren E-Mails an diese Adresse gehen.
                 </p>
                 <p className="mt-2 text-text-muted">
+                  Damit der Link in der Benachrichtigungs-Mail die Antwort direkt öffnen kann, speichert die Website den Abruf-Link im lokalen
+                  Speicher (localStorage) <strong className="text-text-secondary">Ihres eigenen Browsers</strong>. Er wird nicht an uns übertragen und nach dem Abruf
+                  bzw. nach Ablauf der Anfrage entfernt. Diese Speicherung ist für die von Ihnen angeforderte Funktion technisch erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).
+                </p>
+                <p className="mt-2 text-text-muted">
                   Zum Schutz vor automatisiertem Missbrauch löst der Browser eine kurze Rechenaufgabe (Proof-of-Work). Dabei werden keine Cookies gesetzt und
                   keine Drittanbieter eingebunden.
                 </p>

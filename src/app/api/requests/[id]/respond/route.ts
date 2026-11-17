@@ -3,7 +3,7 @@ import * as fs from "fs/promises";
 import { randomBytes } from "crypto";
 import { prisma } from "@/server/db";
 import { respondFileMetaSchema, respondTextSchema } from "@/lib/requestValidation";
-import { consume, getClientIp } from "@/server/security";
+import { consume, getClientIp, siteUrl } from "@/server/security";
 import { secureDelete } from "@/server/storage";
 import { sendMail } from "@/server/mailer";
 import { answeredMail } from "@/server/mailTemplates";
@@ -75,7 +75,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Anfragenden benachrichtigen (nur bestätigte Adresse, ohne Schlüssel/Link)
     const full = await prisma.dataRequest.findUnique({ where: { id } });
     if (full?.requesterEmail && full.inviteSentAt) {
-      sendMail(answeredMail({ to: full.requesterEmail, recipient: full.recipientEmail, expiresAt: full.expiresAt }))
+      sendMail(answeredMail({
+        to: full.requesterEmail, recipient: full.recipientEmail, expiresAt: full.expiresAt,
+        openUrl: `${siteUrl()}/anfrage/oeffnen?id=${id}`,
+      }))
         .catch((e) => console.error("[respond] Benachrichtigung fehlgeschlagen:", e));
     }
 
