@@ -20,6 +20,7 @@ export function Footer() {
               <li><Link href="/" className="hover:text-accent transition-colors">Geheimnis erstellen</Link></li>
               <li><Link href="/so-funktionierts" className="hover:text-accent transition-colors">So funktioniert&apos;s</Link></li>
               <li><Link href="/fuer-unternehmen" className="hover:text-accent transition-colors">Für Unternehmen</Link></li>
+              <li><Link href="/self-hosted" className="hover:text-accent transition-colors">Self-Hosted</Link></li>
             </ul>
           </div>
           

@@ -21,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: 'https://unser-geheimnis.de/self-hosted',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: 'https://unser-geheimnis.de/datenschutz',
       lastModified: new Date(),
       changeFrequency: 'yearly',

@@ -25,6 +25,12 @@ export function Navbar() {
             Für Unternehmen
           </Link>
           <Link
+            href="/self-hosted"
+            className="hidden md:block px-3 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors rounded-lg hover:bg-white/5"
+          >
+            Self-Hosted
+          </Link>
+          <Link
             href="/"
             className="ml-2 px-4 py-2 text-sm font-semibold whitespace-nowrap bg-accent hover:bg-accent-hover text-bg-primary rounded-lg transition-colors"
           >

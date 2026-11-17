@@ -83,6 +83,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Installscript im Browser lesbar anzeigen statt herunterladen
+        source: "/install.sh",
+        headers: [{ key: "Content-Type", value: "text/plain; charset=utf-8" }],
+      },
+      {
         // API: CORS per Env-Var, kein Caching
         source: "/api/:path*",
         headers: [
