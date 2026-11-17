@@ -33,6 +33,10 @@ SMTP_PORT="${UG_SMTP_PORT:-587}"
 SMTP_USER="${UG_SMTP_USER:-}"
 SMTP_PASS="${UG_SMTP_PASS:-}"
 MAIL_FROM="${UG_MAIL_FROM:-}"
+LEGAL_NAME="${UG_LEGAL_NAME:-}"
+LEGAL_ADDRESS="${UG_LEGAL_ADDRESS:-}"
+LEGAL_EMAIL="${UG_LEGAL_EMAIL:-}"
+LEGAL_PHONE="${UG_LEGAL_PHONE:-}"
 NODE_MAJOR=22
 export PRISMA_HIDE_UPDATE_MESSAGE=1 NEXT_TELEMETRY_DISABLED=1
 ASSUME_YES=0
@@ -71,6 +75,11 @@ Optionen:
   --smtp-user <user>    SMTP-Benutzer
   --smtp-pass <pass>    SMTP-Passwort (besser interaktiv eingeben)
   --mail-from <from>    Absender, z. B. "Secrets <noreply@example.de>"
+  --legal-name <name>   Impressum: Name oder Firma des Betreibers
+  --legal-address <a>   Impressum: Anschrift, Zeilen mit | trennen
+                        z. B. "Musterstr. 1|12345 Musterstadt|Deutschland"
+  --legal-email <mail>  Impressum: Kontakt-E-Mail
+  --legal-phone <tel>   Impressum: Telefon (optional)
   -y, --yes             Keine Rückfragen (alle Pflichtwerte per Option)
   -h, --help            Diese Hilfe
 
@@ -95,6 +104,10 @@ while [[ $# -gt 0 ]]; do
     --smtp-user) SMTP_USER="${2:?}"; shift ;;
     --smtp-pass) SMTP_PASS="${2:?}"; shift ;;
     --mail-from) MAIL_FROM="${2:?}"; shift ;;
+    --legal-name)    LEGAL_NAME="${2:?}"; shift ;;
+    --legal-address) LEGAL_ADDRESS="${2:?}"; shift ;;
+    --legal-email)   LEGAL_EMAIL="${2:?}"; shift ;;
+    --legal-phone)   LEGAL_PHONE="${2:?}"; shift ;;
     -y|--yes)    ASSUME_YES=1 ;;
     -h|--help)   usage; exit 0 ;;
     *) die "Unbekannte Option: $1 (siehe --help)" ;;
@@ -121,6 +134,13 @@ confirm() { # confirm <Frage> → 0 = ja
   [[ -z "$TTY" ]] && return 0
   local a; read -r -p "    $1 [J/n]: " a <"$TTY"
   [[ -z "$a" || "$a" =~ ^[JjYy] ]]
+}
+
+# Wert als '…' für die .env ausgeben. Einfache Anführungszeichen verhalten sich in
+# bash, systemd (EnvironmentFile) und dotenv identisch: keine Expansion, keine Escapes.
+q() {
+  [[ "$1" == *"'"* ]] && die "Wert darf kein einfaches Anführungszeichen (') enthalten: ${1:0:20}…"
+  printf "'%s'" "$1"
 }
 
 as_app() { sudo -u "$APP_USER" -H bash -c "cd '$INSTALL_DIR' && set -a && . ./.env && set +a && $*"; }
@@ -195,6 +215,16 @@ collect_config() {
     fi
   fi
   if [[ -n "$SMTP_HOST" ]]; then ok "SMTP: $SMTP_HOST:$SMTP_PORT"; else info "SMTP: nicht konfiguriert (E-Mail-Versand deaktiviert)"; fi
+
+  # Impressum (Pflicht für öffentlich erreichbare Websites in Deutschland)
+  if [[ -z "$LEGAL_NAME" && -n "$TTY" ]]; then
+    info "Angaben für das Impressum (später in .env änderbar, LEGAL_*):"
+    ask LEGAL_NAME "Name oder Firma des Betreibers"
+    ask LEGAL_ADDRESS "Anschrift, Zeilen mit | trennen (z. B. Musterstr. 1|12345 Musterstadt|Deutschland)"
+    ask LEGAL_EMAIL "Kontakt-E-Mail"
+    ask LEGAL_PHONE "Telefon (optional)"
+  fi
+  if [[ -n "$LEGAL_NAME" ]]; then ok "Impressum: $LEGAL_NAME"; else warn "Impressum: nicht ausgefüllt — bitte LEGAL_* in .env setzen"; fi
 }
 
 create_user() {
@@ -242,6 +272,11 @@ write_env() {
   step "Konfigurationsdatei (.env)"
   local env="$INSTALL_DIR/.env"
   mkdir -p "$INSTALL_DIR/data/secrets"
+  # q() läuft in $(…) — Fehler dort würden nicht abbrechen, daher vorab prüfen
+  local v
+  for v in "$LEGAL_NAME" "$LEGAL_ADDRESS" "$LEGAL_EMAIL" "$LEGAL_PHONE" "$SMTP_USER" "$SMTP_PASS" "$MAIL_FROM"; do
+    [[ "$v" != *"'"* ]] || die "Eingaben dürfen kein einfaches Anführungszeichen (') enthalten."
+  done
   if [[ -f "$env" ]]; then
     ok ".env existiert bereits — wird nicht überschrieben"
   else
@@ -257,13 +292,22 @@ write_env() {
       echo "# Schlüssel für HMACs (Codes, Proof-of-Work, E-Mail-Hashes). Geheim halten!"
       echo "APP_SECRET=$(openssl rand -hex 32)"
       echo
+      echo "# Impressum (Betreiberangaben; Anschrift-Zeilen mit | trennen)"
+      echo "LEGAL_NAME=$(q "$LEGAL_NAME")"
+      echo "LEGAL_ADDRESS=$(q "$LEGAL_ADDRESS")"
+      echo "LEGAL_EMAIL=$(q "$LEGAL_EMAIL")"
+      echo "LEGAL_PHONE=$(q "$LEGAL_PHONE")"
+      echo "#LEGAL_REPRESENTATIVE=\"\"   # z. B. Geschäftsführer"
+      echo "#LEGAL_REGISTER=\"\"         # z. B. Amtsgericht München, HRB 12345"
+      echo "#LEGAL_VAT_ID=\"\"           # USt-IdNr."
+      echo
       echo "# E-Mail (optional, für „Daten anfordern“ per E-Mail)"
       if [[ -n "$SMTP_HOST" ]]; then
         echo "SMTP_HOST=\"$SMTP_HOST\""
         echo "SMTP_PORT=$SMTP_PORT"
-        echo "SMTP_USER=\"$SMTP_USER\""
-        echo "SMTP_PASS=\"${SMTP_PASS//\"/\\\"}\""
-        echo "MAIL_FROM=\"${MAIL_FROM:-$DOMAIN <$SMTP_USER>}\""
+        echo "SMTP_USER=$(q "$SMTP_USER")"
+        echo "SMTP_PASS=$(q "$SMTP_PASS")"
+        echo "MAIL_FROM=$(q "${MAIL_FROM:-$DOMAIN <$SMTP_USER>}")"
       else
         echo "#SMTP_HOST=smtp.example.de"
         echo "#SMTP_PORT=587"
@@ -410,8 +454,9 @@ summary() {
     echo "  • Reverse-Proxy mit HTTPS einrichten (Ziel: 127.0.0.1:$PORT), siehe Anleitung."
     echo "    X-Forwarded-For muss der Proxy SETZEN, nicht anhängen (Rate-Limits)."
   fi
-  echo "  • Impressum und Datenschutzerklärung an deinen Betrieb anpassen:"
-  echo "    $INSTALL_DIR/src/app/impressum/page.tsx, …/datenschutz/page.tsx (danach: install.sh update)"
+  echo "  • Impressum: Angaben in $INSTALL_DIR/.env (LEGAL_*) prüfen, danach: systemctl restart $SERVICE"
+  echo "  • Datenschutzerklärung an deinen Betrieb anpassen (Hoster, E-Mail-Dienstleister):"
+  echo "    $INSTALL_DIR/src/app/datenschutz/page.tsx (danach: install.sh update)"
   echo "  • Firewall: nur 22, 80, 443 öffnen. Port $PORT nicht freigeben."
   echo
 }

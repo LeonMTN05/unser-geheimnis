@@ -19,7 +19,7 @@ export default function Datenschutz() {
           <section>
             <h2 className="text-xl font-semibold text-text-primary mb-3">1. Verantwortlicher</h2>
             <p className="text-text-secondary">
-              Verantwortlicher im Sinne der DSGVO ist die im <a href="/impressum" className="text-accent hover:underline">Impressum</a> genannte natürliche Person.
+              Verantwortlicher im Sinne der DSGVO ist der im <a href="/impressum" className="text-accent hover:underline">Impressum</a> genannte Betreiber dieser Website.
             </p>
           </section>
 

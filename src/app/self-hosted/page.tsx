@@ -167,7 +167,7 @@ sudo bash install.sh --domain secrets.example.de --proxy caddy`}
               <li>Installiert <Code>git</Code>, <Code>curl</Code>, <Code>openssl</Code> und Node.js 22 (NodeSource), falls nötig.</li>
               <li>Legt den Systembenutzer <Code>geheimnis</Code> ohne Login-Shell an.</li>
               <li>Klont das Repository nach <Code>/opt/unser-geheimnis</Code>.</li>
-              <li>Erzeugt <Code>.env</Code> mit zufälligem <Code>APP_SECRET</Code> (nur für den Dienst lesbar, Rechte 600).</li>
+              <li>Fragt die Angaben fürs Impressum ab und erzeugt <Code>.env</Code> mit zufälligem <Code>APP_SECRET</Code> (nur für den Dienst lesbar, Rechte 600).</li>
               <li>Installiert Abhängigkeiten, legt die SQLite-Datenbank an und baut die App.</li>
               <li>Richtet einen gehärteten systemd-Dienst ein, der nur auf <Code>127.0.0.1</Code> lauscht.</li>
               <li>Optional: installiert Caddy als Reverse-Proxy mit automatischem HTTPS.</li>
@@ -188,6 +188,9 @@ sudo bash install.sh --domain secrets.example.de --proxy caddy`}
                 [<Code key="a">--smtp-host</Code>, "SMTP-Server für E-Mail-Versand", "–"],
                 [<Code key="a">--smtp-user / --smtp-pass</Code>, "SMTP-Zugangsdaten", "–"],
                 [<Code key="a">--mail-from</Code>, "Absender der E-Mails", "Domain + SMTP-Benutzer"],
+                [<Code key="a">--legal-name / --legal-email</Code>, "Impressum: Betreiber und Kontakt-E-Mail", "fragt nach"],
+                [<Code key="a">--legal-address</Code>, "Impressum: Anschrift, Zeilen mit | getrennt", "fragt nach"],
+                [<Code key="a">--legal-phone</Code>, "Impressum: Telefon", "optional"],
                 [<Code key="a">-y</Code>, "Ohne Rückfragen (z. B. für Ansible / cloud-init)", "–"],
               ]}
             />
@@ -282,6 +285,7 @@ MAIL_DAILY_LIMIT=300          # globale Obergrenze Einladungen/Tag`}
                 [<Code key="a">MAX_FILE_SIZE_MB</Code>, "Maximale Dateigröße (Standard 16)"],
                 [<Code key="a">RATE_LIMIT_MAX</Code>, "Geheimnisse pro IP und Stunde (Standard 10)"],
                 [<Code key="a">SMTP_* / MAIL_FROM</Code>, "E-Mail-Versand, siehe oben"],
+                [<Code key="a">LEGAL_*</Code>, "Angaben fürs Impressum, siehe unten"],
               ]}
             />
 
@@ -304,21 +308,36 @@ MAIL_DAILY_LIMIT=300          # globale Obergrenze Einladungen/Tag`}
 
             {/* Anpassen */}
             <H2 id="anpassen">Impressum, Datenschutz &amp; Branding</H2>
-            <Note tone="warn" title="Rechtliches anpassen">
-              Impressum und Datenschutzerklärung beschreiben den Betrieb von unser-geheimnis.de. Für deine Instanz musst du sie
-              durch eigene Angaben ersetzen, z. B. Verantwortlicher, Hoster, E-Mail-Dienstleister.
+            <P>
+              Die <strong className="text-text-primary">Angaben im Impressum</strong> stehen nicht im Code, sondern in der <Code>.env</Code>.
+              Das Installscript fragt sie ab, ändern kannst du sie jederzeit. Danach genügt ein Neustart:
+            </P>
+            <CodeBlock
+              title="/opt/unser-geheimnis/.env"
+              code={`LEGAL_NAME='Muster GmbH'
+LEGAL_ADDRESS='Musterstraße 1|12345 Musterstadt|Deutschland'   # Zeilen mit | trennen
+LEGAL_EMAIL='impressum@example.de'
+LEGAL_PHONE='+49 123 456789'                 # optional
+LEGAL_REPRESENTATIVE='Max Mustermann'        # optional, z. B. Geschäftsführer
+LEGAL_REGISTER='Amtsgericht München, HRB 12345'   # optional
+LEGAL_VAT_ID='DE123456789'                   # optional`}
+            />
+            <CodeBlock title="Übernehmen" code={`sudo systemctl restart unser-geheimnis`} />
+            <Note tone="warn" title="Datenschutzerklärung prüfen">
+              Die Datenschutzerklärung beschreibt den Betrieb von unser-geheimnis.de, z. B. Hosting in Deutschland und den
+              E-Mail-Dienstleister. Prüfe sie für deine Instanz und passe sie bei Bedarf an. Verantwortlicher ist automatisch der
+              Betreiber aus dem Impressum.
             </Note>
             <Table
               head={["Datei", "Inhalt"]}
               rows={[
-                [<Code key="a">src/app/impressum/page.tsx</Code>, "Impressum"],
                 [<Code key="a">src/app/datenschutz/page.tsx</Code>, "Datenschutzerklärung"],
                 [<Code key="a">src/app/layout.tsx</Code>, "Seitentitel, Beschreibung, Open-Graph-Daten"],
                 [<Code key="a">src/components/ui/Icons.tsx</Code>, "Logo / Wortmarke"],
                 [<Code key="a">src/app/globals.css</Code>, "Farben (Design-Tokens)"],
               ]}
             />
-            <P>Danach <Code>sudo bash install.sh update</Code> ausführen. Deine Änderungen bleiben auch bei künftigen Updates erhalten.</P>
+            <P>Nach Änderungen an diesen Dateien <Code>sudo bash install.sh update</Code> ausführen. Deine Änderungen bleiben auch bei künftigen Updates erhalten.</P>
 
             {/* Manuell */}
             <H2 id="manuell">Manuelle Installation</H2>
@@ -332,6 +351,9 @@ DATABASE_URL="file:/opt/unser-geheimnis/data/prod.db"
 NEXT_PUBLIC_SITE_URL="https://secrets.example.de"
 UPLOAD_DIR="/opt/unser-geheimnis/data/secrets"
 APP_SECRET=$(openssl rand -hex 32)
+LEGAL_NAME='Muster GmbH'
+LEGAL_ADDRESS='Musterstraße 1|12345 Musterstadt|Deutschland'
+LEGAL_EMAIL='impressum@example.de'
 EOF
 chmod 600 .env && mkdir -p data/secrets
 

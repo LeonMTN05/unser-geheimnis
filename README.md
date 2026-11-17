@@ -157,6 +157,12 @@ Alle verfügbaren Variablen sind in [`.env.example`](.env.example) dokumentiert.
 | `SMTP_USER` / `SMTP_PASS` | SMTP-Zugangsdaten | |
 | `MAIL_FROM` | Absender der E-Mails | `unser-geheimnis.de <noreply@unser-geheimnis.de>` |
 | `MAIL_DAILY_LIMIT` | Globale Obergrenze Einladungen pro Tag | `300` |
+| `LEGAL_NAME` | Impressum: Name/Firma des Betreibers | `Muster GmbH` |
+| `LEGAL_ADDRESS` | Impressum: Anschrift, Zeilen mit `\|` getrennt | `Musterstr. 1\|12345 Musterstadt` |
+| `LEGAL_EMAIL` / `LEGAL_PHONE` | Impressum: Kontakt (Telefon optional) | `impressum@example.de` |
+| `LEGAL_REPRESENTATIVE` / `LEGAL_REGISTER` / `LEGAL_VAT_ID` | Impressum: optionale Angaben | |
+
+Self-Hosting mit Installscript: siehe [unser-geheimnis.de/self-hosted](https://unser-geheimnis.de/self-hosted).
 
 ### Daten anfordern: Missbrauchsschutz
 
