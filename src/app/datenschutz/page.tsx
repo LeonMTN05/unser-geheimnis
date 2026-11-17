@@ -12,7 +12,7 @@ export default function Datenschutz() {
     <>
       <main className="flex-grow flex flex-col items-start justify-start p-6 mx-auto w-full max-w-3xl mt-12">
         <h1 className="text-4xl font-serif text-text-primary mb-2">Datenschutzerklärung</h1>
-        <p className="text-text-muted text-sm mb-10">Stand: März 2026 · Gemäß Art. 13 DSGVO</p>
+        <p className="text-text-muted text-sm mb-10">Stand: November 2026 · Gemäß Art. 13 DSGVO</p>
 
         <div className="space-y-10 text-sm leading-relaxed w-full">
 
@@ -49,7 +49,7 @@ export default function Datenschutz() {
                   <li>Gewählte Gültigkeitsdauer (TTL)</li>
                   <li>Zeitstempel der Erstellung</li>
                 </ul>
-                <p className="mt-2 text-text-muted">IP-Adressen werden <strong className="text-text-secondary">nicht gespeichert</strong>. Sie werden ausschließlich temporär (im RAM) für das Rate-Limiting verwendet und nicht protokolliert.</p>
+                <p className="mt-2 text-text-muted">IP-Adressen werden <strong className="text-text-secondary">nicht im Klartext gespeichert</strong>. Für das Rate-Limiting (Missbrauchsschutz) speichern wir ausschließlich einen mit einem geheimen Schlüssel gebildeten Hash (HMAC) der IP-Adresse samt Zeitstempel; diese Einträge werden nach spätestens 48 Stunden automatisch gelöscht.</p>
               </div>
               <div>
                 <p className="font-medium text-text-primary mb-1">3.2 Beim Abrufen eines Geheimnisses</p>
@@ -59,7 +59,31 @@ export default function Datenschutz() {
                 </ul>
               </div>
               <div>
-                <p className="font-medium text-text-primary mb-1">3.3 Server-Logs</p>
+                <p className="font-medium text-text-primary mb-1">3.3 Daten anfordern</p>
+                <p className="mb-2">
+                  Bei einer Datenanfrage erzeugt der Browser des Anfragenden ein Schlüsselpaar. Wir speichern nur den öffentlichen Schlüssel,
+                  die optionale Nachricht und den optionalen Namen des Anfragenden sowie die Gültigkeitsdauer. Die Antwort wird im Browser des
+                  Antwortenden verschlüsselt; nur der Anfragende kann sie mit seinem privaten Schlüssel (nur im Abruf-Link) entschlüsseln.
+                </p>
+                <p className="mb-1">Wird die Anfrage per E-Mail versendet, verarbeiten wir zusätzlich:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>E-Mail-Adresse des Anfragenden (für den Bestätigungscode, als bestätigter Absender in der Einladung und für die Benachrichtigung über eine Antwort)</li>
+                  <li>E-Mail-Adresse des Empfängers (für den Versand der Einladung)</li>
+                  <li>Bestätigungscode und -link nur als Hash, ungültig nach 30 Minuten</li>
+                </ul>
+                <p className="mt-2 text-text-muted">
+                  Beide E-Mail-Adressen werden zusammen mit der Anfrage gelöscht, also nach dem Abruf der Antwort, spätestens mit Ablauf der Gültigkeit
+                  (max. 48 Stunden) bzw. nach 30 Minuten, wenn die Anfrage nicht bestätigt wird. Für die Missbrauchsbegrenzung (z. B. max. Anfragen pro Adresse
+                  und Tag) speichern wir nur einen nicht umkehrbaren Hash (HMAC) der Adressen, der nach 48 Stunden gelöscht wird. Wer sich über den Link in der
+                  E-Mail abmeldet, wird dauerhaft als Hash auf einer Sperrliste geführt, damit keine weiteren E-Mails an diese Adresse gehen.
+                </p>
+                <p className="mt-2 text-text-muted">
+                  Zum Schutz vor automatisiertem Missbrauch löst der Browser eine kurze Rechenaufgabe (Proof-of-Work). Dabei werden keine Cookies gesetzt und
+                  keine Drittanbieter eingebunden.
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-text-primary mb-1">3.4 Server-Logs</p>
                 <p>
                   Unser Webserver protokolliert technisch bedingt: HTTP-Statuscode, Anfragezeitstempel und -methode sowie Datenmenge. <strong className="text-text-secondary">IP-Adressen werden im Webserver-Log nicht dauerhaft gespeichert</strong> bzw. nach spätestens 7 Tagen automatisch gelöscht und sind auf die letzten 8 Bit gekürzt (Anonymisierung).
                 </p>
@@ -70,7 +94,7 @@ export default function Datenschutz() {
           <section>
             <h2 className="text-xl font-semibold text-text-primary mb-3">4. Speicherdauer und Löschung</h2>
             <p className="text-text-secondary mb-3">
-              Geheimnisse werden <strong className="text-text-primary">spätestens nach 48 Stunden</strong> automatisch und unwiderruflich gelöscht — unabhängig davon, ob sie abgerufen wurden.
+              Geheimnisse und Datenanfragen werden <strong className="text-text-primary">spätestens nach 48 Stunden</strong> automatisch und unwiderruflich gelöscht — unabhängig davon, ob sie abgerufen wurden.
               Bei aktivierter „Burn-After-Read"-Option erfolgt die Löschung <strong className="text-text-primary">sofort nach dem ersten Abruf</strong>.
             </p>
             <p className="text-text-secondary">
@@ -83,7 +107,10 @@ export default function Datenschutz() {
             <h2 className="text-xl font-semibold text-text-primary mb-3">5. Rechtsgrundlage</h2>
             <p className="text-text-secondary">
               Die Verarbeitung der verschlüsselten Datensätze erfolgt zur Erbringung des Dienstes auf Grundlage von <strong className="text-text-primary">Art. 6 Abs. 1 lit. b DSGVO</strong> (Vertragserfüllung / vorvertragliche Maßnahmen auf Anfrage des Nutzers).
-              Das temporäre Rate-Limiting (IP im RAM) stützt sich auf <strong className="text-text-primary">Art. 6 Abs. 1 lit. f DSGVO</strong> (berechtigtes Interesse: Schutz vor Missbrauch).
+              Der Versand von Datenanfragen per E-Mail erfolgt auf Veranlassung des Anfragenden (Art. 6 Abs. 1 lit. b DSGVO). Die Verarbeitung der
+              Empfängeradresse stützt sich auf <strong className="text-text-primary">Art. 6 Abs. 1 lit. f DSGVO</strong> (berechtigtes Interesse des Anfragenden an der
+              Zustellung; der Empfänger kann jederzeit über den Abmeldelink widersprechen).
+              Rate-Limiting, Sperrliste und Proof-of-Work stützen sich auf <strong className="text-text-primary">Art. 6 Abs. 1 lit. f DSGVO</strong> (berechtigtes Interesse: Schutz vor Missbrauch).
             </p>
           </section>
 
@@ -91,7 +118,9 @@ export default function Datenschutz() {
             <h2 className="text-xl font-semibold text-text-primary mb-3">6. Cookies, Tracking und externe Dienste</h2>
             <p className="text-text-secondary">
               Diese Website verwendet <strong className="text-text-primary">keine Cookies</strong>, kein Google Analytics, keine Tracking-Pixel, keine Fingerprinting-Technologien und keine sozialen Plugins.
-              Es werden <strong className="text-text-primary">keine Daten an Dritte übermittelt</strong>.
+              Es werden <strong className="text-text-primary">keine Daten an Dritte übermittelt</strong>, mit einer Ausnahme: Für den Versand von E-Mails (nur bei der
+              Funktion „Daten anfordern“ mit E-Mail-Versand) nutzen wir einen E-Mail-Dienstleister als Auftragsverarbeiter (Art. 28 DSGVO). Übermittelt werden
+              dabei nur die für den Versand nötigen Daten (Adressen und E-Mail-Inhalt), niemals verschlüsselte Inhalte oder Schlüssel.
               Sämtliche Schriftarten (Fonts) werden lokal auf unserem Server bereitgestellt — es erfolgt kein Aufruf von Google Fonts oder anderen CDN-Diensten.
             </p>
           </section>
@@ -116,8 +145,8 @@ export default function Datenschutz() {
               <li><strong className="text-text-primary">Beschwerde</strong> bei der zuständigen Aufsichtsbehörde (Art. 77 DSGVO)</li>
             </ul>
             <p className="mt-3 text-text-muted">
-              Hinweis: Da wir keine personenbezogenen Daten verarbeiten und keine Benutzerkonten führen, ist eine Zuordnung von Anfragen zu Personen technisch nicht möglich.
-              Gespeicherte Geheimnisse können nicht einer Person zugeordnet werden.
+              Hinweis: Wir führen keine Benutzerkonten. Gespeicherte Geheimnisse können nicht einer Person zugeordnet werden. E-Mail-Adressen bei Datenanfragen
+              werden nur für die kurze Laufzeit der Anfrage gespeichert (siehe 3.3).
             </p>
           </section>
 

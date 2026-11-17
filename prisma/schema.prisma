@@ -22,3 +22,58 @@ model Secret {
   
   @@index([expiresAt])  // Index für schnelle Cleanup-Abfragen
 }
+
+// ── Daten anfordern ──────────────────────────────────────────────
+// Der Anfragende erzeugt im Browser ein ECDH-Schlüsselpaar. Nur der
+// öffentliche Schlüssel liegt hier; der private steckt ausschließlich im
+// Abruf-Link (URL-Fragment). Die Antwort ist damit für uns unlesbar.
+model DataRequest {
+  id                 String    @id                  // Öffentliche ID (Anfrage-Link /r/<id>)
+  retrievalTokenHash String    @unique              // SHA-256 des Abruf-Tokens (/abruf/<token>)
+  publicKey          String                         // ECDH P-256 SPKI, base64url
+  message            String?                        // Hinweis an den Empfänger (Klartext, max. 300)
+  requesterName      String?
+  status             String                         // PENDING_VERIFICATION | OPEN | ANSWERED
+
+  // Nur bei E-Mail-Versand (werden mit der Anfrage gelöscht)
+  requesterEmail     String?
+  recipientEmail     String?
+  verifyTokenHash    String?
+  verifyCodeHash     String?
+  verifyAttempts     Int       @default(0)
+  verifyExpiresAt    DateTime?
+  inviteSentAt       DateTime?
+
+  // Antwort (Ende-zu-Ende verschlüsselt)
+  responseType       String?                        // TEXT | FILE
+  encryptedData      Bytes?                         // TEXT-Ciphertext
+  responseFile       String?                        // Dateiname auf Disk bei FILE
+  encryptedMeta      String?                        // FILE: verschlüsselter Dateiname/MIME
+  iv                 Bytes?
+  ephemeralPublicKey String?
+  fileSize           Int?
+  respondedAt        DateTime?
+
+  expiresAt          DateTime
+  createdAt          DateTime  @default(now())
+
+  @@index([expiresAt])
+  @@index([status, verifyExpiresAt])
+}
+
+// Adressen, die keine Anfragen mehr erhalten wollen (nur HMAC, kein Klartext)
+model MailBlock {
+  emailHash String   @id
+  createdAt DateTime @default(now())
+}
+
+// Zähler für Rate-Limits und PoW-Replay-Schutz (Schlüssel nur als HMAC)
+model RateEvent {
+  id        Int      @id @default(autoincrement())
+  scope     String
+  keyHash   String
+  createdAt DateTime @default(now())
+
+  @@index([scope, keyHash, createdAt])
+  @@index([createdAt])
+}

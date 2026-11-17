@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SecretCreator } from "@/components/ui/SecretCreator";
+import { HomeCreator } from "@/components/ui/HomeCreator";
 import { Footer } from "@/components/ui/Footer";
 import { Icon, type IconName } from "@/components/ui/Icons";
 
@@ -70,7 +70,7 @@ export default function Home() {
 
         {/* ── FORMULAR ── */}
         <section className="relative w-full max-w-5xl px-6 pb-20">
-          <SecretCreator />
+          <HomeCreator />
         </section>
 
         {/* ── WIE FUNKTIONIERT'S ── */}
@@ -148,7 +148,7 @@ export default function Home() {
               {
                 icon: "eu" as IconName,
                 title: "100% DSGVO-konform",
-                desc: "Kein Google Analytics. Keine Cookies. Kein Tracking. Hosting ausschließlich in Deutschland. Keine personenbezogenen Daten gespeichert.",
+                desc: "Kein Google Analytics. Keine Cookies. Kein Tracking. Hosting ausschließlich in Deutschland. E-Mail-Adressen nur beim optionalen E-Mail-Versand von Anfragen — und nur bis zu deren Ablauf.",
               },
               {
                 icon: "file" as IconName,

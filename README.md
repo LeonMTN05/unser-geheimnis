@@ -151,6 +151,20 @@ Alle verfügbaren Variablen sind in [`.env.example`](.env.example) dokumentiert.
 | `RATE_LIMIT_MAX` | Max. Anfragen pro IP/Stunde | `10` |
 | `MAX_FILE_SIZE_MB` | Max. Dateigröße in MB | `16` |
 | `UPLOAD_DIR` | Pfad für verschlüsselte Dateien | `./data/secrets` |
+| `APP_SECRET` | **Pflicht für „Daten anfordern“ per E-Mail.** Schlüssel für HMACs (Codes, PoW, E-Mail-Hashes), mind. 32 Zeichen. Erzeugen: `openssl rand -hex 32` | `9f2c…` |
+| `SMTP_HOST` | SMTP-Server für E-Mails (ohne: E-Mail-Versand in Produktion deaktiviert) | `smtp.example.de` |
+| `SMTP_PORT` | SMTP-Port (587 = STARTTLS erzwungen, 465 = TLS) | `587` |
+| `SMTP_USER` / `SMTP_PASS` | SMTP-Zugangsdaten | |
+| `MAIL_FROM` | Absender der E-Mails | `unser-geheimnis.de <noreply@unser-geheimnis.de>` |
+| `MAIL_DAILY_LIMIT` | Globale Obergrenze Einladungen pro Tag | `300` |
+
+### Daten anfordern: Missbrauchsschutz
+
+- **Double-Opt-in:** Einladung an den Empfänger erst nach Bestätigung der Absenderadresse (6-stelliger Code oder Link; 30 Min. gültig, max. 5 Versuche). Der Bestätigungslink löst nichts beim bloßen Öffnen aus (Schutz vor Mail-Scannern).
+- **Proof-of-Work** (ALTCHA-Prinzip, selbst gehostet): HMAC-signiert, an die IP gebunden, einmalig, 5 Min. gültig; die Schwierigkeit steigt mit der Aktivität der IP.
+- **Rate-Limits** (DB, HMAC-pseudonymisiert): pro IP 5/h und 15/Tag, pro Absender 3/h und 10/Tag, pro Empfänger 3/Tag, global `MAIL_DAILY_LIMIT`.
+- **Abmeldung/Sperrliste** per signiertem Link in jeder Mail (auch für fälschlich eingetragene Absender).
+- **Inhalt:** keine Links/Domains in Name und Nachricht, nur Links auf die eigene Domain, Hinweis „Domain prüfen“ und „im Zweifel ignorieren“; Honeypot gegen einfache Bots.
 
 ---
 

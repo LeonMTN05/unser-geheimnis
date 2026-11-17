@@ -53,6 +53,36 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // Anfrage-Seiten: niemals cachen, niemals indexieren
+        source: "/r/:id*",
+        headers: [
+          { key: "X-Robots-Tag",   value: "noindex, nofollow" },
+          { key: "Cache-Control",  value: "no-store, no-cache, must-revalidate, proxy-revalidate" },
+          { key: "Pragma",         value: "no-cache" },
+          { key: "Expires",        value: "0" },
+        ],
+      },
+      {
+        // Abruf-Seiten: niemals cachen, niemals indexieren
+        source: "/abruf/:token*",
+        headers: [
+          { key: "X-Robots-Tag",   value: "noindex, nofollow" },
+          { key: "Cache-Control",  value: "no-store, no-cache, must-revalidate, proxy-revalidate" },
+          { key: "Pragma",         value: "no-cache" },
+          { key: "Expires",        value: "0" },
+        ],
+      },
+      {
+        // Bestätigen/Abmelden: niemals cachen, niemals indexieren
+        source: "/anfrage/:path*",
+        headers: [
+          { key: "X-Robots-Tag",   value: "noindex, nofollow" },
+          { key: "Cache-Control",  value: "no-store, no-cache, must-revalidate, proxy-revalidate" },
+          { key: "Pragma",         value: "no-cache" },
+          { key: "Expires",        value: "0" },
+        ],
+      },
+      {
         // API: CORS per Env-Var, kein Caching
         source: "/api/:path*",
         headers: [
