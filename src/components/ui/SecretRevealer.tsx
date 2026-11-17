@@ -41,9 +41,9 @@ function Particles() {
 }
 
 // Schloss-Icon das sich "entsperrt"
-function LockIcon({ phase }: { phase: "locked" | "unlocking" | "unlocked" }) {
+function LockIcon({ phase, small = false }: { phase: "locked" | "unlocking" | "unlocked"; small?: boolean }) {
   return (
-    <div className="relative w-24 h-24 mx-auto">
+    <div className={`relative mx-auto ${small ? "w-11 h-11" : "w-24 h-24"}`}>
       {/* Glow-Halo */}
       <motion.div
         className="absolute inset-0 rounded-full bg-accent/20"
@@ -71,7 +71,7 @@ function LockIcon({ phase }: { phase: "locked" | "unlocking" | "unlocked" }) {
       >
         <motion.svg
           xmlns="http://www.w3.org/2000/svg"
-          className="w-12 h-12"
+          className={small ? "w-5 h-5" : "w-12 h-12"}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -221,7 +221,9 @@ export function SecretRevealer({ id }: { id: string }) {
       await new Promise((r) => setTimeout(r, 700));
 
       if (payload.type === "FILE") {
-        const blob = new Blob([decryptedBuffer], { type: payload.mimeType || "application/octet-stream" });
+        // Bewusst application/octet-stream: Ein vom Absender gewählter Typ wie
+        // text/html würde sonst beim Öffnen im Tab Skripte in unserem Origin ausführen.
+        const blob = new Blob([decryptedBuffer], { type: "application/octet-stream" });
         const objectUrl = URL.createObjectURL(blob);
         setFileData({ url: objectUrl, name: payload.fileName || "unknown_secret.bin", mime: payload.mimeType || "application/octet-stream" });
       } else {
@@ -288,7 +290,8 @@ export function SecretRevealer({ id }: { id: string }) {
             </h1>
             <p className="text-text-secondary mb-6 leading-relaxed max-w-md mx-auto text-sm">
               Jemand hat über einen sicheren, verschlüsselten Link vertrauliche Daten mit dir geteilt.
-              Sobald du es entschlüsselst, wird es bei uns <strong>unwiderruflich gelöscht</strong>.
+              Die Entschlüsselung passiert ausschließlich in deinem Browser. Je nach Einstellung
+              des Absenders wird das Geheimnis danach <strong>sofort gelöscht</strong>.
             </p>
 
             {/* Passwort-Eingabe (nur wenn nötig) */}
@@ -419,7 +422,7 @@ export function SecretRevealer({ id }: { id: string }) {
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.1 }}
               >
-                <LockIcon phase="unlocked" />
+                <LockIcon phase="unlocked" small />
               </motion.div>
               <div>
                 <p className="text-accent font-semibold">Entschlüsselter Inhalt</p>

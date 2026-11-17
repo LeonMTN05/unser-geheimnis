@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db";
-import { createSecretSchema } from "@/lib/validation";
+import { createSecretSchema, createFileSecretSchema } from "@/lib/validation";
 import { createId } from "@paralleldrive/cuid2";
 import * as fs from "fs/promises";
 import * as path from "path";
@@ -61,24 +61,23 @@ export async function POST(req: NextRequest) {
       // FormData einmalig lesen
       const formData = await req.formData();
 
-      type = (formData.get("type") as "TEXT" | "FILE") || "TEXT";
+      type = formData.get("type") === "FILE" ? "FILE" : "TEXT";
       expiresIn = Number(formData.get("expiresIn"));
       burnAfterRead = formData.get("burnAfterRead") === "true";
-      ivBase64 = formData.get("iv") as string;
+      ivBase64 = String(formData.get("iv") ?? "");
 
       if (type === "FILE") {
-        const file = formData.get("file") as File | null;
-        if (!file) {
+        const file = formData.get("file");
+        if (!(file instanceof File)) {
           return NextResponse.json({ error: "Missing file payload" }, { status: 400 });
         }
-        fileName = (formData.get("fileName") as string) || file.name || "unknown.bin";
-        mimeType = (formData.get("mimeType") as string) || file.type || "application/octet-stream";
+        fileName = String(formData.get("fileName") || file.name || "unknown.bin");
+        mimeType = String(formData.get("mimeType") || "application/octet-stream");
         fileSize = file.size;
         // Datei-Bytes einmalig lesen und als Buffer speichern
         fileBuffer = Buffer.from(await file.arrayBuffer());
-        encryptedDataBase64 = fileBuffer.toString("base64");
       } else {
-        encryptedDataBase64 = formData.get("encryptedData") as string;
+        encryptedDataBase64 = String(formData.get("encryptedData") ?? "");
       }
     } else {
       // JSON
@@ -102,11 +101,20 @@ export async function POST(req: NextRequest) {
       if (!result.success) {
         return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
       }
+      burnAfterRead = result.data.burnAfterRead;
+      fileName = fileSize = mimeType = undefined;
     } else if (type === "FILE") {
-      if (!ivBase64 || !fileName || !fileSize || !fileBuffer) {
+      if (!fileBuffer || !fileSize) {
         return NextResponse.json({ error: "Invalid file metadata" }, { status: 400 });
       }
-      if (fileSize > (Number(process.env.MAX_FILE_SIZE_MB) || 16) * 1024 * 1024) {
+      const result = createFileSecretSchema.safeParse({
+        iv: ivBase64, fileName, mimeType, expiresIn, burnAfterRead,
+      });
+      if (!result.success) {
+        return NextResponse.json({ error: "Invalid file metadata" }, { status: 400 });
+      }
+      // +16 Byte für den AES-GCM-Auth-Tag
+      if (fileSize > (Number(process.env.MAX_FILE_SIZE_MB) || 16) * 1024 * 1024 + 16) {
         return NextResponse.json({ error: "File too large (max 16 MB)" }, { status: 413 });
       }
     } else {

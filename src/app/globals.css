@@ -1,53 +1,76 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: var(--color-bg-primary);
-  --color-foreground: var(--color-text-primary);
-  
-  --color-primary: var(--color-bg-primary);
-  --color-secondary: var(--color-bg-secondary);
-  --color-card: var(--color-bg-card);
-  
-  --color-accent: var(--color-accent);
-  --color-accent-hover: var(--color-accent-hover);
-  --color-accent-glow: var(--color-accent-glow);
-  
-  --color-danger: var(--color-danger);
-  --color-warning: var(--color-warning);
-  --color-success: var(--color-success);
-  
-  --color-border-subtle: var(--color-border);
-  --color-border-focus: var(--color-border-focus);
+/*
+ * Design-Tokens. Jede Farbe hier erzeugt Tailwind-Klassen:
+ * --color-bg-card → bg-bg-card, --color-text-muted → text-text-muted,
+ * --color-border → border-border usw.
+ */
+@theme {
+  /* Flächen: tiefes Blau-Schwarz */
+  --color-bg-primary: #0a0e1a;
+  --color-bg-secondary: #10172a;
+  --color-bg-card: #161e33;
+  --color-bg-elevated: #1c2640;
+
+  /* Alias für bestehende Klassen (bg-primary, text-primary) */
+  --color-primary: #0a0e1a;
+
+  /* Akzent: kühles Teal */
+  --color-accent: #06d6a0;
+  --color-accent-hover: #2ee6b6;
+  --color-accent-glow: rgba(6, 214, 160, 0.15);
+
+  /* Text */
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #a3b1c6;
+  --color-text-muted: #7586a0;
+
+  /* Status */
+  --color-danger: #f87171;
+  --color-warning: #fbbf24;
+  --color-success: #34d399;
+
+  /* Rahmen */
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
+  --color-border-focus: rgba(6, 214, 160, 0.45);
 
   --font-sans: var(--font-inter);
   --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 }
 
-:root {
-  /* Primär: Tiefes, vertrauenswürdiges Blau-Schwarz */
-  --color-bg-primary: #0a0e1a;
-  --color-bg-secondary: #111827;
-  --color-bg-card: #1a2035;
-  
-  /* Akzent: Kühles Teal/Cyan */
-  --color-accent: #06d6a0;
-  --color-accent-hover: #05c896;
-  --color-accent-glow: rgba(6, 214, 160, 0.15);
-  
-  /* Text */
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #475569;
-  
-  /* Status */
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
-  --color-success: #10b981;
-  
-  /* Borders */
-  --color-border: rgba(255, 255, 255, 0.06);
-  --color-border-focus: rgba(6, 214, 160, 0.4);
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+::selection {
+  background: rgba(6, 214, 160, 0.3);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Feines Raster im Hero-Hintergrund */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 40%, transparent 100%);
 }
 
 body {

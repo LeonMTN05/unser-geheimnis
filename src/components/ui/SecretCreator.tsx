@@ -25,7 +25,7 @@ export function SecretCreator() {
   const [burnAfterRead, setBurnAfterRead] = useState(DEFAULT_BURN_AFTER_READ);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ url: string; expiresAt: string } | null>(null);
+  const [result, setResult] = useState<{ url: string; expiresAt: string; burnAfterRead: boolean } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Passwortschutz
@@ -127,7 +127,7 @@ export function SecretCreator() {
 
       const url = `${window.location.origin}/s/${id}#${fragment}`;
 
-      setResult({ url, expiresAt });
+      setResult({ url, expiresAt, burnAfterRead });
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Es ist ein unerwarteter Fehler aufgetreten.");
@@ -137,7 +137,7 @@ export function SecretCreator() {
   };
 
   if (result) {
-    return <LinkDisplay url={result.url} expiresAt={result.expiresAt} />;
+    return <LinkDisplay url={result.url} expiresAt={result.expiresAt} burnAfterRead={result.burnAfterRead} />;
   }
 
   return (

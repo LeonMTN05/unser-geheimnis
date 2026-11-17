@@ -9,4 +9,4 @@ export const MAX_FILE_SIZE_BYTES = 16 * 1024 * 1024; // 16 MB
 // Base64 overhead is ~33%, so we allow some buffer for the base64 encoded payload
 export const MAX_PAYLOAD_SIZE_BYTES = Math.floor(MAX_FILE_SIZE_BYTES * 1.5); 
 
-export const DEFAULT_BURN_AFTER_READ = false;
+export const DEFAULT_BURN_AFTER_READ = true;

@@ -7,9 +7,10 @@ import QRCode from "qrcode";
 interface LinkDisplayProps {
   url: string;
   expiresAt: string;
+  burnAfterRead: boolean;
 }
 
-export function LinkDisplay({ url, expiresAt }: LinkDisplayProps) {
+export function LinkDisplay({ url, expiresAt, burnAfterRead }: LinkDisplayProps) {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -112,8 +113,12 @@ export function LinkDisplay({ url, expiresAt }: LinkDisplayProps) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span>🔥</span>
-          <span>Wird nach dem ersten Lesen sofort <strong>unwiderruflich gelöscht</strong>.</span>
+          <span>{burnAfterRead ? "🔥" : "🔁"}</span>
+          {burnAfterRead ? (
+            <span>Wird nach dem ersten Lesen sofort <strong>unwiderruflich gelöscht</strong>.</span>
+          ) : (
+            <span>Kann bis zum Ablauf <strong>mehrfach abgerufen</strong> werden.</span>
+          )}
         </div>
       </div>
 

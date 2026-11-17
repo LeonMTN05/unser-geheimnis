@@ -26,8 +26,8 @@ export function ExpirySelector({ selectedTTL, onChange, disabled }: ExpirySelect
               type="button"
               onClick={() => !disabled && onChange(hours)}
               disabled={disabled}
-              className={`relative px-4 py-1.5 text-sm rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-card disabled:opacity-50 ${
-                isSelected ? "text-primary" : "text-text-secondary hover:text-text-primary bg-bg-secondary hover:bg-opacity-80"
+              className={`relative isolate px-4 py-1.5 text-sm rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-bg-card disabled:opacity-50 ${
+                isSelected ? "text-bg-primary font-semibold" : "text-text-secondary hover:text-text-primary bg-bg-secondary hover:bg-bg-elevated"
               }`}
             >
               {isSelected && (

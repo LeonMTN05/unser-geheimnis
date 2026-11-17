@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SecretCreator } from "@/components/ui/SecretCreator";
 import { Footer } from "@/components/ui/Footer";
+import { Icon, type IconName } from "@/components/ui/Icons";
 
 export default function Home() {
   const jsonLd = {
@@ -28,7 +29,8 @@ export default function Home() {
         <section className="relative w-full flex flex-col items-center px-6 pt-20 pb-16 text-center">
           {/* Subtile Hintergrund-Glows */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-accent/5 blur-3xl" />
+            <div className="absolute inset-0 bg-grid" />
+            <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-accent/10 blur-3xl" />
             <div className="absolute top-20 -left-40 w-[400px] h-[400px] rounded-full bg-blue-500/4 blur-3xl" />
             <div className="absolute top-10 -right-40 w-[350px] h-[350px] rounded-full bg-accent/4 blur-3xl" />
           </div>
@@ -43,22 +45,23 @@ export default function Home() {
           </div>
 
           {/* Headline */}
-          <h1 className="relative text-4xl sm:text-5xl md:text-6xl font-serif text-text-primary mb-5 leading-tight max-w-3xl">
+          <h1 className="relative text-4xl sm:text-5xl md:text-6xl font-serif text-text-primary mb-6 leading-[1.1] tracking-tight max-w-3xl text-balance">
             Teile sensible Daten.<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-400">
               Verschlüsselt. Einmalig. Spurlos.
             </span>
           </h1>
 
-          <p className="relative text-text-secondary text-lg max-w-xl mb-10 leading-relaxed">
+          <p className="relative text-text-secondary text-lg max-w-xl mb-10 leading-relaxed text-pretty">
             Passwörter, API-Keys und Zugangsdaten sicher an Kunden oder Kollegen übertragen —
             ohne Drittanbieter-Risiken, ohne Logs, ohne Spuren.
           </p>
 
           {/* Trust-Pills */}
           <div className="relative flex flex-wrap justify-center gap-3 mb-4 text-xs text-text-muted">
-            {["🔐 AES-256-GCM", "🔑 Schlüssel nur im Link", "🔥 Burn-after-read", "🇩🇪 Hosting Deutschland", "🚫 Kein Tracking"].map((item) => (
-              <span key={item} className="px-3 py-1 rounded-full border border-border bg-bg-secondary">
+            {["AES-256-GCM", "Schlüssel nur im Link", "Burn-after-read", "Hosting in Deutschland", "Kein Tracking"].map((item) => (
+              <span key={item} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-border bg-bg-secondary/60 text-text-secondary">
+                <svg className="w-3 h-3 text-accent" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clipRule="evenodd" /></svg>
                 {item}
               </span>
             ))}
@@ -85,26 +88,26 @@ export default function Home() {
               {[
                 {
                   step: "01",
-                  icon: "✍️",
+                  icon: "pencil" as IconName,
                   title: "Eingeben",
                   desc: "Text, Passwort, API-Key oder Datei — direkt im Browser eingeben. Nichts verlässt noch deinen Computer.",
                 },
                 {
                   step: "02",
-                  icon: "🔗",
+                  icon: "link" as IconName,
                   title: "Verschlüsseln & Teilen",
                   desc: "Dein Browser verschlüsselt die Daten lokal. Du erhältst einen einmaligen Link — der Schlüssel steckt nur im Link-Fragment.",
                 },
                 {
                   step: "03",
-                  icon: "🔥",
+                  icon: "flame" as IconName,
                   title: "Lesen & Vergessen",
                   desc: "Empfänger öffnet den Link, entschlüsselt lokal. Danach: sofortige, unwiderrufliche Löschung vom Server.",
                 },
               ].map(({ step, icon, title, desc }) => (
                 <div key={step} className="relative flex flex-col items-center text-center">
                   <div className="relative w-16 h-16 rounded-full bg-bg-card border-2 border-accent/30 flex items-center justify-center mb-4 shadow-lg shadow-accent/5">
-                    <span className="text-2xl">{icon}</span>
+                    <Icon name={icon} className="w-7 h-7 text-accent" />
                     <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-accent text-bg-primary text-xs font-bold flex items-center justify-center">
                       {step.slice(1)}
                     </span>
@@ -133,41 +136,43 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
               {
-                icon: "🛡️",
+                icon: "shield" as IconName,
                 title: "Zero-Knowledge",
                 desc: "Dein Geheimnis wird im Browser verschlüsselt. Der Schlüssel existiert ausschließlich im Link. Wir können deine Daten physikalisch nicht lesen — kein Admin, kein Hacker.",
               },
               {
-                icon: "🔥",
+                icon: "flame" as IconName,
                 title: "Burn-after-read",
                 desc: "Sobald der Empfänger den Link öffnet, wird der Datensatz sofort und unwiderruflich gelöscht. Dateien werden vor der Löschung mit Zufallsdaten überschrieben.",
               },
               {
-                icon: "🇪🇺",
+                icon: "eu" as IconName,
                 title: "100% DSGVO-konform",
                 desc: "Kein Google Analytics. Keine Cookies. Kein Tracking. Hosting ausschließlich in Deutschland. Keine personenbezogenen Daten gespeichert.",
               },
               {
-                icon: "📁",
+                icon: "file" as IconName,
                 title: "Dateien bis 16 MB",
                 desc: "Nicht nur Text — auch Dateien, Zertifikate, SSH-Keys oder Konfigurationsdateien verschlüsselt übermitteln.",
               },
               {
-                icon: "⏱",
+                icon: "clock" as IconName,
                 title: "Flexible Laufzeit",
                 desc: "Gültigkeitsdauer von 1 bis 48 Stunden wählbar. Abgelaufene Geheimnisse werden automatisch gelöscht.",
               },
               {
-                icon: "⚡",
+                icon: "bolt" as IconName,
                 title: "Kein Account nötig",
                 desc: "Einfach öffnen und loslegen. Keine Registrierung, keine App, kein Login — für Ersteller und Empfänger.",
               },
             ].map(({ icon, title, desc }) => (
               <div
                 key={title}
-                className="group p-6 rounded-2xl bg-bg-secondary border border-border hover:border-accent/30 hover:bg-bg-card transition-all duration-200"
+                className="group p-6 rounded-2xl bg-bg-secondary border border-border hover:border-accent/30 hover:bg-bg-card hover:-translate-y-0.5 transition-all duration-200"
               >
-                <div className="text-3xl mb-4">{icon}</div>
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 ring-1 ring-accent/20 text-accent group-hover:bg-accent/15 transition-colors">
+                  <Icon name={icon} className="w-5.5 h-5.5" />
+                </div>
                 <h3 className="text-text-primary font-semibold mb-2">{title}</h3>
                 <p className="text-text-secondary text-sm leading-relaxed">{desc}</p>
               </div>
@@ -178,7 +183,7 @@ export default function Home() {
         {/* ── TRUST / ZERO-KNOWLEDGE-ERKLÄRUNG ── */}
         <section className="w-full bg-bg-secondary border-t border-border py-20 px-6">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="text-5xl mb-6">🔒</div>
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10 ring-1 ring-accent/25 text-accent shadow-[0_0_40px_rgba(6,214,160,0.15)]"><Icon name="lock" className="w-8 h-8" /></div>
             <h2 className="text-3xl font-serif text-text-primary mb-5">
               Selbst wir können dein Geheimnis nicht lesen.
             </h2>

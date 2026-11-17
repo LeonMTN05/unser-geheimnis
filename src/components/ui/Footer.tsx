@@ -1,14 +1,13 @@
 import Link from "next/link";
+import { Logo } from "./Icons";
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-border pt-10 pb-6">
+    <footer className="mt-auto border-t border-border bg-bg-secondary/40 pt-12 pb-8">
       <div className="max-w-5xl mx-auto px-6 h-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div className="lg:col-span-2">
-            <h2 className="text-xl font-serif text-text-primary flex items-center gap-2 mb-4">
-              🔒 unser-geheimnis<span className="text-accent">.de</span>
-            </h2>
+            <div className="mb-4"><Logo /></div>
             <p className="text-text-secondary text-sm leading-relaxed max-w-sm">
               Sicherer Webdienst zum verschlüsselten Teilen von Passwörtern, 
               API-Keys und Zugangsdaten mittels Zero-Knowledge Architektur.
@@ -34,7 +33,7 @@ export function Footer() {
         </div>
         
         <div className="pt-8 border-t border-border flex justify-between items-center text-xs text-text-muted flex-col sm:flex-row gap-4 text-center sm:text-left">
-          <p>© {new Date().getFullYear()} unser-geheimnis.de — Made with 🛡️ in Germany</p>
+          <p>© {new Date().getFullYear()} unser-geheimnis.de — Made in Germany</p>
           <div className="flex gap-4">
              <span className="flex items-center gap-1">
                <span className="w-2 h-2 rounded-full bg-success"></span>
