@@ -32,11 +32,7 @@ function VerifyClient({ id, token }: { id: string; token: string }) {
       button="Bestätigen & Einladung senden"
       endpoint={`/api/requests/${id}/verify`}
       body={{ token }}
-      success={(d) =>
-        d.alreadyVerified ? "Diese Anfrage war bereits bestätigt."
-        : d.invited ? "Bestätigt. Die Einladung wurde an den Empfänger versendet. Die Antwort öffnest du über deinen gespeicherten Abruf-Link."
-        : `Bestätigt, aber die Einladung konnte nicht versendet werden: ${String(d.reason || "")} Den Anfrage-Link findest du über deinen Abruf-Link.`
-      }
+      kind="verify"
     />
   );
 }

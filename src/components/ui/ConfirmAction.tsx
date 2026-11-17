@@ -12,7 +12,8 @@ export function ConfirmAction(props: {
   button: string;
   endpoint: string;
   body: Record<string, string>;
-  success: (data: Record<string, unknown>) => string;
+  // Nur serialisierbare Props — Funktionen können nicht vom Server übergeben werden
+  kind: "verify" | "optout";
 }) {
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [msg, setMsg] = useState("");
@@ -27,7 +28,7 @@ export function ConfirmAction(props: {
       });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || "Das hat nicht geklappt.");
-      setMsg(props.success(d));
+      setMsg(successMessage(props.kind, d));
       setState("done");
     } catch (e) {
       setMsg(e instanceof Error ? e.message : "Das hat nicht geklappt.");
@@ -52,4 +53,11 @@ export function ConfirmAction(props: {
       )}
     </div>
   );
+}
+
+function successMessage(kind: "verify" | "optout", d: Record<string, unknown>): string {
+  if (kind === "optout") return "Erledigt. An diese Adresse werden keine E-Mails mehr versendet.";
+  if (d.alreadyVerified) return "Diese Anfrage war bereits bestätigt.";
+  if (d.invited) return "Bestätigt. Die Einladung wurde an den Empfänger versendet. Die Antwort öffnest du über deinen gespeicherten Abruf-Link.";
+  return `Bestätigt, aber die Einladung konnte nicht versendet werden: ${String(d.reason || "")} Den Anfrage-Link findest du über deinen Abruf-Link.`;
 }

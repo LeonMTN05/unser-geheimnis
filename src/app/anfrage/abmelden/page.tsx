@@ -20,7 +20,7 @@ export default async function OptOutPage({ searchParams }: { searchParams: Promi
             button="Jetzt abmelden"
             endpoint="/api/requests/optout"
             body={{ e, s }}
-            success={() => "Erledigt. An diese Adresse werden keine E-Mails mehr versendet."}
+            kind="optout"
           />
         ) : (
           <p className="text-danger">Ungültiger Abmelde-Link.</p>
